@@ -11,7 +11,7 @@ import getpass
 EMAIL = os.environ.get('EMAIL') or getpass.getpass('Enter your email: ')
 PASSWORD = os.environ.get('PASSWORD') or getpass.getpass('Enter your email password: ')
 
-def send_email(to_email, filepath = None):
+def send_emails(to_email, filepath = "../data/pillars_of_creation.jpg"):
     context = ssl.create_default_context()
 
     server = smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context)
@@ -19,31 +19,42 @@ def send_email(to_email, filepath = None):
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL
-    msg['To'] = "cosinize@gmail.com"
+    msg['To'] = to_email
     msg['Subject'] = "Test"
     body = "Hello"
     msg.attach(MIMEText(body, 'plain'))
 
-    if not os.path.exists(filepath):
-        raise FileNotFoundError(f"File not found: {filepath}")
-    elif not os.path.isfile(filepath):
-        raise ValueError(f"Path is not a file: {filepath}")
-    elif filepath is not None:
-        filepath = "../data/pillars_of_creation.jpg"
-        filename = os.path.basename(filepath)
-        attachment = open(filepath, 'rb')
+    try:
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"File not found: {filepath}")
+        elif not os.path.isfile(filepath):
+            raise ValueError(f"Path is not a file: {filepath}")
+        elif filepath is not None:
+            filepath = "../data/pillars_of_creation.jpg"
+            filename = os.path.basename(filepath)
+            attachment = open(filepath, 'rb')
 
-        p = MIMEBase('application', 'octet-stream')
-        p.set_payload(attachment.read())
+            p = MIMEBase('application', 'octet-stream')
+            p.set_payload(attachment.read())
 
-        encoders.encode_base64(p)
-        p.add_header('Content-Disposition', f'attachment; filename={filename}')
-        msg.attach(p)
+            encoders.encode_base64(p)
+            p.add_header('Content-Disposition', f'attachment; filename={filename}')
+            msg.attach(p)
+    except Exception as e:
+        print(f"Exception cought while reading filepath: {e}")
 
     text = msg.as_string()
     server.sendmail(EMAIL, to_email, text)
+    
+
+def send_email():
+    pass
 
 
 def main():
     to_email = input("Enter the email of the recipient: ").strip()
-    send_email(to_email)
+    send_emails(to_email)
+    
+
+if __name__ == "__main__":
+    main()
