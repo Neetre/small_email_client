@@ -1,3 +1,4 @@
+import os
 import smtplib
 from email import encoders
 from email.mime.text import MIMEText
@@ -5,23 +6,30 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 import ssl
 
-import os
-import getpass
 
-EMAIL = os.environ.get('EMAIL') or getpass.getpass('Enter your email: ')
-PASSWORD = os.environ.get('PASSWORD') or getpass.getpass('Enter your email password: ')
+EMAIL = os.environ.get('EMAIL')
+PASSWORD = os.environ.get('PASSWORD')
 
-def send_emails(to_email, filepath = "../data/pillars_of_creation.jpg"):
+
+def smtp_server(email):
+    domain = email.split("@")[1]
+    domain = "smtp." + domain
+    return domain
+
+
+def send_emails(to_email, subject, body, filepath: str = None):
+    server = smtp_server(EMAIL)
     context = ssl.create_default_context()
 
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context)
+    server = smtplib.SMTP_SSL(server, 587, context=context)
     server.login(EMAIL, PASSWORD)
 
     msg = MIMEMultipart()
-    msg['From'] = EMAIL
-    msg['To'] = to_email
-    msg['Subject'] = "Test"
-    body = "Hello"
+    msg['From'] = to_email
+    msg['To'] = EMAIL
+    msg['Subject'] = subject
+    msg.add_header('reply-to', to_email)
+    body = body
     msg.attach(MIMEText(body, 'plain'))
 
     try:
@@ -30,7 +38,7 @@ def send_emails(to_email, filepath = "../data/pillars_of_creation.jpg"):
         elif not os.path.isfile(filepath):
             raise ValueError(f"Path is not a file: {filepath}")
         elif filepath is not None:
-            filepath = "../data/pillars_of_creation.jpg"
+            filepath = filepath
             filename = os.path.basename(filepath)
             attachment = open(filepath, 'rb')
 
