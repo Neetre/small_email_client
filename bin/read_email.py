@@ -9,26 +9,27 @@ IMAP_SERVER = 'imap.gmail.com'
 EMAIL_ACCOUNT = os.environ.get('EMAIL')
 PASSWORD = os.environ.get('PASSWORD')
 
-
 def smtp_server(email):
     domain = email.split("@")[1]
     domain = "smtp." + domain
     return domain
 
 
-def read_email(mailbox='inbox', filter='UNSEEN'):
-    data = []
+def read_email(mailbox='inbox', filter='UNSEEN', email_filter=None) -> list:
+    emails = []
     server = smtp_server(EMAIL_ACCOUNT)
     mail = imaplib.IMAP4_SSL(server)
     mail.login(EMAIL_ACCOUNT, PASSWORD)
 
     mail.select(mailbox)
-    status, email_ids = mail.search(None, filter)
+    search_filter = filter if email_filter is None else email_filter
+    status, email_ids = mail.search(None, search_filter)
     email_ids = email_ids[0].split()
     
     for e_id in email_ids:
         _, data = mail.fetch(e_id, "(RFC822)")
-        email_message = email.message_from_bytes(data[0][1])
+        raw_email = data[0][1]
+        email_message = email.message_from_bytes(raw_email)
         
         # print(f"Message Number: {e_id}")
         # print(f"From: {email_message.get('From')}")
@@ -38,7 +39,7 @@ def read_email(mailbox='inbox', filter='UNSEEN'):
         # print(f"Subject: {email_message.get('Subject')}")
         
         msg = {
-            "Message Number": e_id,
+            "ID": e_id,
             "From": email_message.get("From"),
             "To": email_message.get("To"),
             "BCC": email_message.get("BCC"),
@@ -47,7 +48,6 @@ def read_email(mailbox='inbox', filter='UNSEEN'):
             "Body": ""
         }
 
-        print("Content: ")
         if email_message.is_multipart():
             for part in email_message.walk():
                 content_type = part.get_content_type()
@@ -60,12 +60,12 @@ def read_email(mailbox='inbox', filter='UNSEEN'):
             content_type = email_message.get_content_type()
             body = email_message.get_payload(decode=True).decode()
             msg["Body"] = body
-        data.append(msg)
+        emails.append(msg)
 
     mail.close()
     mail.logout()
-
-    return data
+    print(f"{len(emails)} emails found!")
+    return emails
 
     
 def main():
