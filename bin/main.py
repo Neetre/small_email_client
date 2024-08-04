@@ -43,7 +43,7 @@ def show_emails(emails: list):
 def main():
     mailbox = 'inbox'
     filter = 'UNSEEN'
-    email_filter = "FROM ''"
+    email_filter = "FROM 'mattiabraga2006@gmail.com'"
     emails = read_email(mailbox, filter, email_filter)
     print(len(emails), "emails found!")
     if len(emails) == 0:
@@ -59,6 +59,7 @@ def main():
             print("Subject:", email["Subject"])
             print("Date:", email["Date"])
             print("Body:", email["Body"])
+            print("Message-ID:", email["Message-ID"])
 
             next_email = input("\nDo you want to see the next email? (y/n): ")
             if next_email.lower() == 'n':
@@ -74,11 +75,21 @@ def main():
         return
     body = email["Body"]
     to_email = email["From"]
-
-    text_response = auto_response(body)
-    print("Response:", text_response)
-    # send_email(to_email, text_response)
-    print("Email sent!")
+    ok = False
+    while not ok:
+        text_response = auto_response(body)
+        print("Response:\n", text_response)
+        
+        is_response_correct = input(f"Is this the correct response? (y/n):")
+        if is_response_correct.lower() == 'n':
+            print("Regenerating response...")
+            continue
+        ok = True
+        subject = email["Subject"]
+        reference = (email["References"] or "") + " " + email["Message-ID"]
+        message_id = email["Message-ID"]
+        send_email(to_email, subject, reference, message_id, text_response)  # to_email, subject, reference, message_id, body, filepath: str = None
+        print("Email sent!")
 
 
 if __name__ == "__main__":

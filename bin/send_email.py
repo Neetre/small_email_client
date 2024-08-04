@@ -9,6 +9,7 @@ import ssl
 
 EMAIL = os.environ.get('EMAIL')
 PASSWORD = os.environ.get('PASSWORD')
+SMTP_PORT = 465  # Use 465 for SSL, 587 for TLS
 
 
 def smtp_server(email):
@@ -17,19 +18,14 @@ def smtp_server(email):
     return domain
 
 
-def send_emails(to_email, subject, body, filepath: str = None):
-    server = smtp_server(EMAIL)
-    context = ssl.create_default_context()
-
-    server = smtplib.SMTP_SSL(server, 587, context=context)
-    server.login(EMAIL, PASSWORD)
-
+def send_email(to_email, subject, reference, message_id, body, filepath: str = None):
     msg = MIMEMultipart()
-    msg['From'] = to_email
-    msg['To'] = EMAIL
-    msg['Subject'] = subject
-    msg.add_header('reply-to', to_email)
-    body = body
+    msg['From'] = EMAIL
+    msg['To'] = to_email
+    msg['Subject'] = "Re: " + subject
+    msg['In-Reply-To'] = reference
+    msg['Message-ID'] = message_id
+
     msg.attach(MIMEText(body, 'plain'))
 
     try:
@@ -51,17 +47,16 @@ def send_emails(to_email, subject, body, filepath: str = None):
     except Exception as e:
         print(f"Exception cought while reading filepath: {e}")
 
-    text = msg.as_string()
-    server.sendmail(EMAIL, to_email, text)
-    
-
-def send_email():
-    pass
+    context = ssl.create_default_context()
+    SMTP_SERVER = smtp_server(EMAIL)
+    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
+        server.login(EMAIL, PASSWORD)
+        server.sendmail(EMAIL, to_email, msg.as_string())
 
 
 def main():
     to_email = input("Enter the email of the recipient: ").strip()
-    send_emails(to_email)
+    send_email(to_email)
     
 
 if __name__ == "__main__":

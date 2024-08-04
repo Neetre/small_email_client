@@ -45,6 +45,8 @@ def read_email(mailbox='inbox', filter='UNSEEN', email_filter=None) -> list:
             "BCC": email_message.get("BCC"),
             "Date": email_message.get("Date"),
             "Subject": email_message.get("Subject"),
+            "References": email_message.get("References"),
+            "Message-ID" : email_message.get("Message-ID"),
             "Body": ""
         }
 
