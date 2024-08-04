@@ -67,6 +67,7 @@ def read_email(mailbox='inbox', filter='UNSEEN', email_filter=None) -> list:
     mail.close()
     mail.logout()
     print(f"{len(emails)} emails found!")
+    emails = sorted(emails, key=lambda x: x["Date"], reverse=True)
     return emails
 
     
