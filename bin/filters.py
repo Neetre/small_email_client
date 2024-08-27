@@ -1,1 +1,1 @@
-EMAILS=["email1", "email2", "email3"]
+EMAILS="" # "email1", "email2", "email3"
