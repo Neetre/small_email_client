@@ -26,7 +26,7 @@ These scripts will install required dependencies, and build a virtual environmen
 
 ```bash
 cd bin
-python ./main.py
+python ./main.py [--help]
 ```
 
 Here is a list of commands you can use:
