@@ -6,6 +6,9 @@ This is a small email client that can send emails to a single recipient. It is w
 
 ## Requirements
 
+GROQ_API key is required to run this project. You can get it from the [GROQ API website](https://www.groq.com/)
+Have to insert the GROQ_API key in the .env file, fill out also the other fields.
+
 python >= 3.9
 
 To run the project, you need to have Python installed on your machine. You can download Python from the [official website](https://www.python.org/downloads/)
