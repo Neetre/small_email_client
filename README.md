@@ -24,7 +24,11 @@ cd bin
 python ./main.py
 ```
 
+Here is a list of commands you can use:
 ![help](./data/readme/help.png)
+
+Here is an example of the auto-response you will get when you send an email:
+![usage](./data/readme/test_response.png)
 
 ## License
 
