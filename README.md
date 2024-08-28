@@ -2,7 +2,9 @@
 
 ## Description
 
-This is a small email client that can send emails to a single recipient. It is written in Python and uses the smtplib library to send emails.
+This is a small email client that can send emails to a single recipient.
+It will also send an auto-response email to the sender when an email is received.
+It is written in Python and uses the smtplib library to send emails.
 
 ## Requirements
 
